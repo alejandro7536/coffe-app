@@ -2,10 +2,10 @@
 const { useState: useS, useEffect: useE, useMemo, useCallback: useCb } = React;
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
-  "layout": "split",
-  "mode3d": "coverflow",
+  "layout": "editorial",
+  "mode3d": "turntable",
   "anim": "kinetic",
-  "glass": "medium",
+  "glass": "subtle",
   "showNotes": true,
   "ambientGlow": true
 }/*EDITMODE-END*/;

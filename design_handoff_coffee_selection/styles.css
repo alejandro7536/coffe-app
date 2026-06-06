@@ -575,10 +575,10 @@ html, body {
   background: radial-gradient(circle, color-mix(in oklch, var(--card-accent, var(--accent)) 55%, transparent), transparent 65%);
   filter: blur(6px); opacity: 0.55; pointer-events: none;
 }
-.drink-card .thumb { position: relative; height: 190px; display: grid; place-items: center; z-index: 1; }
-.drink-card .thumb img { height: 100%; width: auto; filter: drop-shadow(0 20px 22px rgba(0,0,0,0.5)); transition: transform 0.5s var(--ease-out); }
+.drink-card .thumb { position: relative; height: 180px; display: flex; align-items: center; justify-content: center; z-index: 1; margin-bottom: 4px; }
+.drink-card .thumb img { max-height: 180px; height: auto; width: auto; max-width: 78%; filter: drop-shadow(0 20px 22px rgba(0,0,0,0.5)); transition: transform 0.5s var(--ease-out); }
 .drink-card:hover .thumb img { transform: translateY(-6px) scale(1.04); }
-.drink-card .card-name { font-family: var(--font-head); font-weight: 700; font-size: 19px; margin-top: 6px; position: relative; z-index: 1; }
+.drink-card .card-name { font-family: var(--font-head); font-weight: 700; font-size: 19px; margin-top: 6px; position: relative; z-index: 1; text-shadow: 0 1px 8px rgba(22,12,7,0.6); }
 .drink-card .card-sub { color: var(--on-surface-variant); font-size: 13.5px; margin-top: 2px; position: relative; z-index: 1; }
 .drink-card .card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; position: relative; z-index: 1; }
 .drink-card .card-price { font-family: var(--font-head); font-weight: 700; font-size: 18px; color: var(--primary-container); }

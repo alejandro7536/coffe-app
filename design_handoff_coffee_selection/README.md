@@ -12,16 +12,21 @@ The files in this bundle are **design references created in HTML/CSS/React-via-B
 ---
 
 ## ⭐ Locked configuration (build THIS as the default)
-The prototype exposes several variants via a tweak panel. Ship the following combination as the default — ignore the other variants unless asked:
+The prototype exposes several variants via a tweak panel. Ship the following combination as the default — ignore the other variants unless asked. These exact values are also set as `TWEAK_DEFAULTS` in `app/App.jsx`:
 
-- **Layout:** `editorial` — full-bleed 3D stage with a giant ghosted drink word behind the cup; a frosted-glass info card floats bottom-left; progress dots bottom-right.
-- **3D mechanic:** `tilt` — only the hero cup is shown; it tilts/parallaxes toward the mouse (rotateX/Y + small translate); neighbour chevrons (with prev/next drink name) change the selection; the floor glow follows the tilt.
+- **Layout:** `editorial` — full-bleed 3D stage with a giant ghosted drink word behind the cup; a glass info card floats bottom-left; progress dots bottom-right.
+- **3D mechanic:** `turntable` — only the hero cup is shown; **drag horizontally to spin it** (rotateY clamped to ±46°, slight scale-down while spinning); releasing past a ~60px threshold advances to the next/previous drink, otherwise it springs back. A "Drag to spin" hint sits at the bottom of the stage; neighbour chevrons (with prev/next drink name) also change the selection.
 - **Animation preset:** `kinetic` — hero cup gently floats (bob), ambient amber glow "breathes", buttons use spring easing, cup swaps fade+scale in.
-- **Glass intensity:** `frosted` — `--glass-blur: 34px`, fill `rgba(41,29,23,0.68)`, strong `rgba(52,39,33,0.82)`, stroke `rgba(245,222,213,0.20)`.
-- **Flavor notes chips:** hidden.
+- **Glass intensity:** `subtle` — `--glass-blur: 14px`, fill `rgba(41,29,23,0.40)`, strong `rgba(52,39,33,0.58)`, stroke `rgba(245,222,213,0.08)`.
+- **Flavor notes chips:** **shown** (the small "Vanilla / Caramel / Espresso" pills under the description).
 - **Ambient glow pulse:** on.
 
-> The other variants in the prototype (layouts `split`/`spotlight`; mechanics `coverflow`/`turntable`/`orbit`; presets `smooth`/`vapor`) are documented in `app/Stage.jsx` and `app/Selection.jsx` if you ever want them, but are **out of scope** for the build.
+> The other variants in the prototype (layouts `split`/`spotlight`; mechanics `coverflow`/`tilt`/`orbit`; presets `smooth`/`vapor`) are documented in `app/Stage.jsx` and `app/Selection.jsx` if you ever want them, but are **out of scope** for the build.
+
+## Change log (most recent design revisions)
+- **Heart icon:** all heart glyphs (`heart`, `heartOutline`, `heartFill` in `app/data.js`) replaced with a clean, symmetric heart that has a sharp bottom point — no flat "base". Used in the nav favourite button, the card heart toggle, the menu favourite button, and the "Fan Fav" badge.
+- **Favourites cards:** the cup image is now height-capped (`max-height: 180px`, `max-width: 78%`) inside a flex-centered thumb so it can never overlap the drink name/price below; the card name also got a subtle `text-shadow` for legibility. See `.drink-card .thumb` / `.drink-card .thumb img` / `.drink-card .card-name` in `styles.css`.
+- **Locked config** updated to the values above (was previously split / coverflow / frosted / notes-hidden).
 
 ---
 
@@ -31,7 +36,7 @@ The prototype exposes several variants via a tweak panel. Ship the following com
 - **Purpose:** Browse the 6 drinks, pick a size, confirm to add to cart.
 - **Layout (editorial):** Full-height stage centered in the viewport. Behind the cup, a giant outlined word (first word of the drink name, e.g. "Caramel") at `clamp(120px,19vw,320px)`, weight 800, transparent fill with `1.5px` stroke `rgba(245,222,213,0.10)`. The hero cup PNG sits center, ~`min(46%,360px)` wide, drop-shadow `0 38px 34px rgba(0,0,0,0.55)`. A frosted glass card (max-width 400px) floats at `left:0; bottom:8%` containing: eyebrow "Coffee Selection", drink name (gradient text), italic tagline, score row (star + "4.9 Score"), description, size selector, price + favourite + badge, and the primary CTA. Progress dots at `right:16px; bottom:8%`.
 - **Stage chrome:** temp chip (fire/ice icon) top-right of stage; circular neighbour chevrons left/right at vertical center, each with the neighbour drink's name beneath.
-- **Hero interaction (tilt):** on `mousemove` over the stage, rotate the cup `rotateX(-py*18deg) rotateY(px*26deg)` and translate `(px*26px, py*18px)` where px/py are -0.5..0.5 cursor offsets; ease back on mouseleave (`transform 0.6s cubic-bezier(0.16,1,0.3,1)`). The floor glow translates at 0.6× the cup.
+- **Hero interaction (turntable):** on `pointerdown` over the hero cup, track horizontal drag: rotate the cup `rotateY(clamp(dx*0.35, -46deg, 46deg))` with a slight `scale(1 - abs(rot)/600)` while dragging (transition off during drag). On release: if `dx < -60` advance to next drink, if `dx > 60` go to previous, otherwise spring back (`transform 0.6s cubic-bezier(0.34,1.56,0.64,1)`). A "Drag to spin" hint with an animated swipe dot sits at the bottom of the stage.
 - **Selection change:** clicking a neighbour chevron (or ← →, or a dot) changes `index`; the new cup fades+scales in (`cupIn` keyframe, 0.7s), accent color + ambient glow cross-fade to the drink's accent, size resets to first.
 
 ### 2. Favourites
@@ -63,7 +68,7 @@ The prototype exposes several variants via a tweak panel. Ship the following com
 
 ## Interactions & Behavior
 - **Drink switch:** ← / → keys, neighbour chevrons, progress dots. Each switch: cross-fade cup, retint accent + ambient glow, reset size index to 0.
-- **Tilt:** mouse parallax on hero cup (see Menu above); disabled feel under `prefers-reduced-motion`.
+- **Turntable:** drag the hero cup horizontally to spin it; release past ±60px to change drink, otherwise spring back (see Menu above). Disabled feel under `prefers-reduced-motion`.
 - **Favourite:** heart toggles membership in a `Set`; nav badge + Favourites grid update live.
 - **Add to cart / Confirm:** dedupes by `drinkId-sizeLabel`, increments qty if present; shows toast.
 - **Qty stepper:** decrement below 1 removes the line.
@@ -88,7 +93,7 @@ All drink data lives in `app/data.js` (`window.DRINKS`, `window.HISTORY`, `windo
 **Surfaces:** surface `#1c110c`, low `#160c07`, container-low `#251913`, container `#291d17`, container-high `#342721`, container-highest `#40322c`, bright `#453630`.
 **Text:** on-surface `#f5ded5`, on-surface-variant `#d8c2b4`, outline `#a08d80`, outline-variant `#534439`.
 **Brand:** primary `#ffcca6`, primary-container `#f9a866`, primary-dim `#ffb77f`, on-primary `#4e2600`, tertiary `#ffcabc`, tertiary-container `#ffa38a`.
-**Glass (frosted / locked):** blur `34px`, fill `rgba(41,29,23,0.68)`, fill-strong `rgba(52,39,33,0.82)`, stroke `rgba(245,222,213,0.20)`, plus `inset 0 1px 0 rgba(255,255,255,0.08)` and shadow `0 18px 40px -18px rgba(0,0,0,0.7)`.
+**Glass (subtle / locked):** blur `14px`, fill `rgba(41,29,23,0.40)`, fill-strong `rgba(52,39,33,0.58)`, stroke `rgba(245,222,213,0.08)`, plus `inset 0 1px 0 rgba(255,255,255,0.08)` and shadow `0 18px 40px -18px rgba(0,0,0,0.7)`. (The prototype also defines `medium` and `frosted` presets in `GLASS_PRESETS` — subtle is the locked one.)
 **Accent:** per-drink, set on `--accent` at runtime (e.g. caramel `#d8a05f`, mocha `#a9633c`, cold-brew `#c98a52`).
 **Radii:** sm .5rem, md .75rem, lg 1rem, xl 1.5rem, 2xl 2rem; pills `999px`.
 **Type:** headings **Sora** (700/800), body **Be Vietnam Pro** (400–600). Load via `next/font/google`. Title sizes use `clamp()` (see `styles.css`).
@@ -99,10 +104,11 @@ All drink data lives in `app/data.js` (`window.DRINKS`, `window.HISTORY`, `windo
 - Inline SVG icon set in `app/data.js` `window.ICONS` (heart, cart, star, fire, ice, chevrons, plus/minus, trash, check, bolt, leaf, etc.) → port to an `Icon` component or individual SVG components. `fire.svg` / `ice.svg` also exist in `images/`.
 
 ## Files in this bundle
+- `screenshots/` — reference renders of each screen at 1440×900: `01-menu.png` (the locked **editorial** selection screen with the 3D turntable cup + floating glass info card), `02-favourites.png`, `03-history.png`, `04-profile.png`, `05-cart.png`. Use these to match the look; the live prototype is the source of truth for motion.
 - `Chap Coffee.html` — entry / script wiring.
 - `styles.css` — full design system (tokens, glass, all screens, motion). **Primary styling reference.**
 - `app/data.js` — drinks, history, icons.
-- `app/Stage.jsx` — the 3D stage + all 4 mechanics (tilt is the locked one).
+- `app/Stage.jsx` — the 3D stage + all 4 mechanics (turntable is the locked one).
 - `app/Selection.jsx` — the 3 selection layouts (editorial is the locked one).
 - `app/Screens.jsx` — Favourites / History / Profile / Cart.
 - `app/App.jsx` — state, nav, cart/fav logic, tweak wiring (drop the tweak layer in prod).
