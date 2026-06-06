@@ -1,0 +1,158 @@
+// ===== Chap Coffee — data layer =====
+// Carousel ring order deduced from the original captures:
+// Cold Brew -> Caramel Macchiato -> Iced Latte -> Mocha -> Espresso -> Cappuccino -> (loop)
+
+window.DRINKS = [
+  {
+    id: "cold-brew",
+    name: "Cold Brew",
+    tagline: "Slow & Smooth",
+    score: 4.6,
+    temp: "cold",
+    badge: { icon: "rising", label: "Rising" },
+    desc: "Slow-steeped for 18 hours, our cold brew delivers a remarkably smooth, naturally sweet flavor profile with low acidity. Served over ice with cold foam.",
+    img: "images/cold-brew.png",
+    sizes: [
+      { label: "S", price: 5.99 },
+      { label: "M", price: 6.49 },
+      { label: "L", price: 6.99 },
+    ],
+    accent: "#c98a52",
+    notes: ["18h Steep", "Low Acidity", "Cold Foam"],
+    caffeine: 205,
+    kcal: 25,
+  },
+  {
+    id: "caramel-macchiato",
+    name: "Caramel Macchiato",
+    tagline: "Sweet & Layered",
+    score: 4.9,
+    temp: "hot",
+    badge: { icon: "heart", label: "Fan Fav" },
+    desc: "Freshly steamed milk with vanilla-flavored syrup, marked with espresso and topped with buttery caramel drizzle. A sweet, layered masterpiece.",
+    img: "images/caramel-macchiato.png",
+    sizes: [
+      { label: "S", price: 6.49 },
+      { label: "M", price: 6.99 },
+      { label: "L", price: 7.49 },
+    ],
+    accent: "#d8a05f",
+    notes: ["Vanilla", "Caramel", "Espresso"],
+    caffeine: 150,
+    kcal: 250,
+  },
+  {
+    id: "iced-latte",
+    name: "Iced Latte",
+    tagline: "Crisp & Refreshing",
+    score: 4.5,
+    temp: "cold",
+    badge: { icon: "rising", label: "Rising" },
+    desc: "Bold espresso poured over ice and fresh milk, finished with a silky swirl of cold foam. Cool, balanced and endlessly refreshing for any time of day.",
+    img: "images/iced-latte.png",
+    sizes: [
+      { label: "S", price: 5.49 },
+      { label: "M", price: 5.99 },
+      { label: "L", price: 6.49 },
+    ],
+    accent: "#bd8a5c",
+    notes: ["Over Ice", "Silky", "Balanced"],
+    caffeine: 165,
+    kcal: 130,
+  },
+  {
+    id: "mocha",
+    name: "Mocha",
+    tagline: "Rich & Indulgent",
+    score: 4.9,
+    temp: "hot",
+    badge: { icon: "trending", label: "Trending" },
+    desc: "Rich espresso meets premium dark chocolate, topped with whipped cream and a chocolate drizzle. An indulgent treat for chocolate lovers.",
+    img: "images/mocha.png",
+    sizes: [
+      { label: "S", price: 6.29 },
+      { label: "M", price: 6.79 },
+      { label: "L", price: 7.29 },
+    ],
+    accent: "#a9633c",
+    notes: ["Dark Cocoa", "Whipped", "Drizzle"],
+    caffeine: 175,
+    kcal: 360,
+  },
+  {
+    id: "espresso",
+    name: "Espresso",
+    tagline: "Strong & Bold",
+    score: 4.7,
+    temp: "hot",
+    badge: { icon: "classic", label: "Classic" },
+    desc: "A concentrated shot of our finest single-origin beans. Bold, intense, and rich with a golden crema on top. The purest coffee experience.",
+    img: "images/espresso.png",
+    sizes: [
+      { label: "Single", price: 3.99 },
+      { label: "Double", price: 4.99 },
+    ],
+    accent: "#c4783f",
+    notes: ["Single Origin", "Golden Crema", "Intense"],
+    caffeine: 127,
+    kcal: 5,
+  },
+  {
+    id: "cappuccino",
+    name: "Cappuccino",
+    tagline: "Balanced & Foamy",
+    score: 4.8,
+    temp: "hot",
+    badge: { icon: "classic", label: "Classic" },
+    desc: "Equal parts rich espresso, steamed milk and a thick crown of velvety microfoam, dusted with cocoa. A timeless balance of strength and softness.",
+    img: "images/cappuccino.png",
+    sizes: [
+      { label: "S", price: 4.99 },
+      { label: "M", price: 5.49 },
+      { label: "L", price: 5.99 },
+    ],
+    accent: "#cf935c",
+    notes: ["Microfoam", "Latte Art", "Timeless"],
+    caffeine: 173,
+    kcal: 120,
+  },
+];
+
+// History (recent orders) — fabricated but plausible
+window.HISTORY = [
+  { id: "mocha", date: "Today · 8:24 AM", size: "M", price: 6.79, status: "Ready" },
+  { id: "caramel-macchiato", date: "Yesterday · 9:10 AM", size: "L", price: 7.49, status: "Picked up" },
+  { id: "espresso", date: "Mon · 7:45 AM", size: "Double", price: 4.99, status: "Picked up" },
+  { id: "cold-brew", date: "Sun · 2:30 PM", size: "S", price: 5.99, status: "Picked up" },
+  { id: "cappuccino", date: "Fri · 8:05 AM", size: "M", price: 5.49, status: "Picked up" },
+];
+
+// Inline SVG icon set (stroke = currentColor unless noted)
+window.ICONS = {
+  rising: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>',
+  trending: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 4.6L19 7l-3.6 3.4L16.3 16 12 13.3 7.7 16l.9-5.6L5 7l5.1-.4L12 2z"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-10-9.2C.6 8.9 2 5.5 5.2 5.5c2 0 3.2 1.2 3.8 2.3C9.6 6.7 10.8 5.5 12.8 5.5 16 5.5 17.4 8.9 16 11.8 13.5 16.4 12 21 12 21z" transform="translate(-0.4 0)"/></svg>',
+  classic: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.5 7H22l-6 4.5L18.5 22 12 17.5 5.5 22 8 13.5 2 9h7.5z" opacity="0"/><path d="M12 3l2 5 5 .5-3.8 3.3 1.2 5L12 14.5 7.6 16.8l1.2-5L5 8.5 10 8z"/></svg>',
+  heartOutline: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20.3s-6.8-4.2-9.1-8.4C1.6 9.4 2.9 6.3 5.8 6.3c1.8 0 2.9 1.1 3.4 2.1.5-1 1.6-2.1 3.4-2.1 2.9 0 4.2 3.1 2.9 5.6-2.3 4.2-9.1 8.4-9.1 8.4z" transform="translate(0.5 0)"/></svg>',
+  cart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2.2l2 12.2a1.6 1.6 0 0 0 1.6 1.3h8.8a1.6 1.6 0 0 0 1.6-1.2L21 7H6"/></svg>',
+  arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>',
+  chevL: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
+  chevR: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+  star: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l2 5 5 .5-3.8 3.3 1.2 5L12 14.5 7.6 16.8l1.2-5L5 8.5 10 8z"/></svg>',
+  fire: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5.926 20.574a7.26 7.26 0 0 0 3.039 1.511c.107.035.179-.105.107-.175-2.395-2.285-1.079-4.758-.107-5.873.693-.796 1.68-2.107 1.608-3.865 0-.176.18-.317.322-.211 1.359.703 2.288 2.25 2.538 3.515.394-.386.537-.984.537-1.511 0-.176.214-.317.393-.176 1.287 1.16 3.503 5.097-.072 8.19-.071.071 0 .212.072.177a8.761 8.761 0 0 0 3.003-1.442c5.827-4.5 2.037-12.48-.43-15.116-.321-.317-.893-.106-.893.351-.036.95-.322 2.004-1.072 2.707-.572-2.39-2.478-5.105-5.195-6.441-.357-.176-.786.105-.75.492.07 3.27-2.063 5.352-3.922 8.059-1.645 2.425-2.717 6.89.822 9.808z"/></svg>',
+  ice: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17L9 20M12 17L15 20M12 17V12M12 17V21M12 7L9 4M12 7L15 4M12 7V12M12 7V3M12 12L7.67 9.5M12 12L16.33 14.5M12 12L7.67 14.5M12 12L16.33 9.5M16.33 14.5L17.43 18.6M16.33 14.5L20.43 13.4M16.33 14.5L19.79 16.5M7.67 9.5L3.57 10.6M7.67 9.5L6.57 5.4M7.67 9.5L4.21 7.5M16.33 9.5L20.43 10.6M16.33 9.5L17.43 5.4M16.33 9.5L19.79 7.5M7.67 14.5L6.57 18.6M7.67 14.5L3.57 13.4M7.67 14.5L4.21 16.5"/></svg>',
+  heartFill: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20.3s-6.8-4.2-9.1-8.4C1.6 9.4 2.9 6.3 5.8 6.3c1.8 0 2.9 1.1 3.4 2.1.5-1 1.6-2.1 3.4-2.1 2.9 0 4.2 3.1 2.9 5.6-2.3 4.2-9.1 8.4-9.1 8.4z" transform="translate(0.5 0)"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>',
+  bolt: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg>',
+  flame: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 3-1 4-2 6-1 2 0 3 1 3 0-1 1-2 2-2 0 4-3 4-3 7 0 2 2 4 4 4s4-2 4-5c0-5-6-7-6-13z"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  minus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>',
+  leaf: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 21c-1-7 3-14 14-15 1 8-3 14-14 15zM5 21c2-5 5-7 9-9"/></svg>',
+};
+
+window.badgeIcon = function (key) {
+  return window.ICONS[key] || window.ICONS.star;
+};
