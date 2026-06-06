@@ -33,9 +33,17 @@ export default function DrinkInfoCard() {
         <span>{d.score.toFixed(1)} Score</span>
       </div>
 
-      <p className="desc" style={{ marginTop: 10, marginBottom: 18 }}>
+      <p className="desc" style={{ marginTop: 10, marginBottom: 16 }}>
         {d.desc}
       </p>
+
+      <div className="notes-row" style={{ marginBottom: 20 }}>
+        {d.notes.map((n) => (
+          <span className="note-chip" key={n}>
+            {n}
+          </span>
+        ))}
+      </div>
 
       <div className="field-label">Select Size</div>
       <div className="size-row">
