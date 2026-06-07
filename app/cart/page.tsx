@@ -14,7 +14,7 @@ export default function CartPage() {
   const itemCount = cart.reduce((s, i) => s + i.qty, 0);
 
   const checkout = () => {
-    showToast("Order placed — see you soon!");
+    showToast("Order placed", "Thanks! Your order is brewing — see you soon.");
     clearCart();
   };
 

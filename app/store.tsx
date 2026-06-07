@@ -51,8 +51,8 @@ interface StoreValue {
   clearCart: () => void;
   reorder: (entry: HistoryEntry) => void;
   // toast
-  toast: string | null;
-  showToast: (msg: string) => void;
+  toast: { title: string; description?: string } | null;
+  showToast: (title: string, description?: string) => void;
 }
 
 const FAVS_SEED = ["mocha", "caramel-macchiato"];
@@ -66,7 +66,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [sizeIdx, setSizeIdx] = useState(0);
   const [favs, setFavs] = useState<Set<string>>(() => new Set(FAVS_SEED));
   const [cart, setCart] = useState<CartLine[]>([]);
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ title: string; description?: string } | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -114,8 +114,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [cart, hydrated]);
 
   // ---- toast ----
-  const showToast = useCallback((msg: string) => {
-    setToast(msg);
+  const showToast = useCallback((title: string, description?: string) => {
+    setToast({ title, description });
     if (toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(null), 2400);
   }, []);
@@ -163,7 +163,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           },
         ];
       });
-      showToast(`${drink.name} added to cart`);
+      showToast("Added to cart", `${drink.name} (${size.label}) added to your order.`);
     },
     [showToast],
   );
