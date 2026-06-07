@@ -1,11 +1,11 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
+import { Toaster } from "sileo";
 import { useStore } from "../store";
 import AmbientBackground from "./AmbientBackground";
 import Nav from "./Nav";
 import Footer from "./Footer";
-import Toast from "./Toast";
 
 // Visual shell shared by every route. Sets the live --accent (from the active
 // drink) on the app root so the ambient aurora and any accent-keyed surfaces
@@ -22,7 +22,13 @@ export default function AppShell({ children }: { children: ReactNode }) {
       <Nav />
       {children}
       <Footer />
-      <Toast />
+      {/* sileo's `theme` is the PAGE theme, so "light" renders a dark toast
+          with light text; `fill` keeps it on-brand near-black. */}
+      <Toaster
+        position="bottom-center"
+        theme="light"
+        options={{ fill: "#120b07" }}
+      />
     </div>
   );
 }

@@ -2,9 +2,9 @@
 
 // ===== Chap Coffee — shared client store =====
 // Single source of truth for the active drink selection, favourites, cart and
-// transient toast. Favourites + cart persist to localStorage. Drink index /
-// size index are intentionally in-memory (they describe the current browsing
-// session, not saved data).
+// notifications. Favourites + cart persist to localStorage. Drink index / size
+// index are intentionally in-memory (they describe the current browsing
+// session, not saved data). Notifications are delegated to sileo.
 
 import {
   createContext,
@@ -12,10 +12,10 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from "react";
+import { sileo } from "sileo";
 import { DRINKS, DRINKS_BY_ID, type Drink, type HistoryEntry } from "@/lib/drinks";
 
 export interface CartLine {
@@ -50,8 +50,7 @@ interface StoreValue {
   removeItem: (key: string) => void;
   clearCart: () => void;
   reorder: (entry: HistoryEntry) => void;
-  // toast
-  toast: { title: string; description?: string } | null;
+  // notifications (sileo)
   showToast: (title: string, description?: string) => void;
 }
 
@@ -66,10 +65,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [sizeIdx, setSizeIdx] = useState(0);
   const [favs, setFavs] = useState<Set<string>>(() => new Set(FAVS_SEED));
   const [cart, setCart] = useState<CartLine[]>([]);
-  const [toast, setToast] = useState<{ title: string; description?: string } | null>(null);
   const [hydrated, setHydrated] = useState(false);
-
-  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ---- selection ----
   const setIndex = useCallback((i: number) => {
@@ -113,60 +109,62 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, [cart, hydrated]);
 
-  // ---- toast ----
+  // ---- notification helper (success toast) ----
   const showToast = useCallback((title: string, description?: string) => {
-    setToast({ title, description });
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(null), 2400);
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (toastTimer.current) clearTimeout(toastTimer.current);
-    };
+    sileo.success({ title, description });
   }, []);
 
   // ---- favourites ----
-  const toggleFav = useCallback((id: string) => {
-    setFavs((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
+  const toggleFav = useCallback(
+    (id: string) => {
+      const wasFav = favs.has(id);
+      const drink = DRINKS_BY_ID[id];
+      setFavs((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+      if (wasFav) {
+        sileo.info({ title: "Removed from favourites", description: drink?.name });
+      } else {
+        sileo.success({ title: "Added to favourites", description: drink?.name });
+      }
+    },
+    [favs],
+  );
 
   // ---- cart ----
-  const addToCart = useCallback(
-    (drink: Drink, sIdx = 0) => {
-      const size = drink.sizes[sIdx];
-      const key = `${drink.id}-${size.label}`;
-      setCart((prev) => {
-        const existing = prev.find((it) => it.key === key);
-        if (existing) {
-          return prev.map((it) =>
-            it.key === key ? { ...it, qty: it.qty + 1 } : it,
-          );
-        }
-        return [
-          ...prev,
-          {
-            key,
-            id: drink.id,
-            name: drink.name,
-            tagline: drink.tagline,
-            img: drink.img,
-            accent: drink.accent,
-            size: size.label,
-            price: size.price,
-            qty: 1,
-          },
-        ];
-      });
-      showToast("Added to cart", `${drink.name} (${size.label}) added to your order.`);
-    },
-    [showToast],
-  );
+  const addToCart = useCallback((drink: Drink, sIdx = 0) => {
+    const size = drink.sizes[sIdx];
+    const key = `${drink.id}-${size.label}`;
+    setCart((prev) => {
+      const existing = prev.find((it) => it.key === key);
+      if (existing) {
+        return prev.map((it) =>
+          it.key === key ? { ...it, qty: it.qty + 1 } : it,
+        );
+      }
+      return [
+        ...prev,
+        {
+          key,
+          id: drink.id,
+          name: drink.name,
+          tagline: drink.tagline,
+          img: drink.img,
+          accent: drink.accent,
+          size: size.label,
+          price: size.price,
+          qty: 1,
+        },
+      ];
+    });
+    sileo.success({
+      title: "Added to cart",
+      description: `${drink.name} · ${size.label}`,
+    });
+  }, []);
 
   const setQty = useCallback((key: string, qty: number) => {
     setCart((prev) =>
@@ -176,9 +174,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
-  const removeItem = useCallback((key: string) => {
-    setCart((prev) => prev.filter((it) => it.key !== key));
-  }, []);
+  const removeItem = useCallback(
+    (key: string) => {
+      const line = cart.find((it) => it.key === key);
+      setCart((prev) => prev.filter((it) => it.key !== key));
+      if (line) {
+        sileo.error({ title: "Removed from cart", description: line.name });
+      }
+    },
+    [cart],
+  );
 
   const clearCart = useCallback(() => setCart([]), []);
 
@@ -218,7 +223,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       removeItem,
       clearCart,
       reorder,
-      toast,
       showToast,
     }),
     [
@@ -227,7 +231,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       favs,
       cart,
       cartCount,
-      toast,
       setIndex,
       setIndexById,
       toggleFav,
