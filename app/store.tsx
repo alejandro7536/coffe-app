@@ -58,6 +58,10 @@ const FAVS_SEED = ["mocha", "caramel-macchiato"];
 const FAVS_KEY = "chap.favs";
 const CART_KEY = "chap.cart";
 
+// Friendly size names for notifications (labels like "Single"/"Double" pass through).
+const SIZE_NAMES: Record<string, string> = { S: "Small", M: "Medium", L: "Large" };
+const sizeName = (label: string) => SIZE_NAMES[label] ?? label;
+
 const StoreContext = createContext<StoreValue | null>(null);
 
 export function StoreProvider({ children }: { children: ReactNode }) {
@@ -125,10 +129,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         else next.add(id);
         return next;
       });
+      const favDesc = drink
+        ? `${drink.name} · ${drink.tagline} · ${drink.score.toFixed(1)}★`
+        : undefined;
       if (wasFav) {
-        sileo.info({ title: "Removed from favourites", description: drink?.name });
+        sileo.info({ title: "Removed from favourites", description: favDesc });
       } else {
-        sileo.success({ title: "Added to favourites", description: drink?.name });
+        sileo.success({ title: "Added to favourites", description: favDesc });
       }
     },
     [favs],
@@ -162,7 +169,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     });
     sileo.success({
       title: "Added to cart",
-      description: `${drink.name} · ${size.label}`,
+      description: `${drink.name} · ${sizeName(size.label)} · $${size.price.toFixed(2)}`,
     });
   }, []);
 
@@ -179,7 +186,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       const line = cart.find((it) => it.key === key);
       setCart((prev) => prev.filter((it) => it.key !== key));
       if (line) {
-        sileo.error({ title: "Removed from cart", description: line.name });
+        const qtyPart = line.qty > 1 ? ` ×${line.qty}` : "";
+        sileo.error({
+          title: "Removed from cart",
+          description: `${line.name} · ${sizeName(line.size)}${qtyPart} · $${(
+            line.price * line.qty
+          ).toFixed(2)}`,
+        });
       }
     },
     [cart],
