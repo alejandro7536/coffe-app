@@ -2,6 +2,8 @@
 // Carousel ring order: Cold Brew -> Caramel Macchiato -> Iced Latte ->
 // Mocha -> Espresso -> Cappuccino -> (loop)
 
+import { BASE_PATH } from "./config";
+
 export interface DrinkSize {
   label: string;
   price: number;
@@ -38,7 +40,7 @@ export interface HistoryEntry {
   status: "Ready" | "Picked up";
 }
 
-export const DRINKS: Drink[] = [
+const RAW_DRINKS: Drink[] = [
   {
     id: "cold-brew",
     name: "Cold Brew",
@@ -153,6 +155,13 @@ export const DRINKS: Drink[] = [
     kcal: 120,
   },
 ];
+
+// Prefix cup image paths with the deployment base path — plain <img> src
+// values are not rewritten by Next's basePath, so we do it here at the source.
+export const DRINKS: Drink[] = RAW_DRINKS.map((d) => ({
+  ...d,
+  img: `${BASE_PATH}${d.img}`,
+}));
 
 // History (recent orders) — fabricated but plausible
 export const HISTORY: HistoryEntry[] = [
